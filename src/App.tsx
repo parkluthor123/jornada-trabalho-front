@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import Home from './views/Home'
+import { CssBaseline } from '@mui/material'
 
 function App() {
   return (
     <div className="App">
-      <h1>Teste</h1>
+      <CssBaseline/>
+      <Home/>
     </div>
   )
 }
