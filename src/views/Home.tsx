@@ -1,5 +1,5 @@
 import { Container } from "@mui/system";
-import { Box, Typography, Checkbox, Select, MenuItem, Button, SelectChangeEvent } from "@mui/material";
+import { Box, Typography, Checkbox, Select, MenuItem, Button, SelectChangeEvent, Alert } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Weeks from "../mocks/Week";
 import WeeksInterface from "../interfaces/Weeks";
@@ -7,13 +7,21 @@ import DaysButton from "../components/DaysButton";
 import TimeInputs from "../components/TimeInputs";
 import api from "../services/Api";
 import toCapitalize from "../Utils/ToCapitalize";
+import Message from "../components/Message";
+import MessageInterface from "../interfaces/Message";
 
 const Home: React.FC = () => {
     const [daysOfWeek, setDaysOfWeek] = useState<Array<WeeksInterface>>([]);
     const [selectWorkDay, setSelectWorkDay] = useState<string>("2");
     const [activeWorkDay, setActiveWorkDay] = useState<boolean>(false);
+    const [message, setMessage] = useState<MessageInterface>({text: "", type: "success", show: false});
+
+    const showMessage = (data: MessageInterface)=>{
+        setMessage({...data, show: true});
+    }
 
     const sendData = async () => {
+         setMessage({text: "", type: "success", show: false});
          const data = {
              workDayIsActive: activeWorkDay,
              workDay: selectWorkDay,
@@ -22,13 +30,17 @@ const Home: React.FC = () => {
 
         try {
             const res = await api.put('/config', data);
-            console.log(res.data);
+            if(res.status === 200)
+            {
+                showMessage({text: res.data.message, type: "success", show: true});
+            }
         } catch (e: any) {
-            
+            showMessage({text: e.message, type: "error", show: true});
         }
     }
 
     const getData = async () => {
+        setMessage({text: "", type: "success", show: false});
         try {
             const res = await api.get('/config');
             if(res.status === 200)
@@ -59,7 +71,7 @@ const Home: React.FC = () => {
                 }
             }
         } catch (e: any) {
-            console.log(e.message)
+            showMessage({text: e.message, type: "error", show: true});
         }
     }
 
@@ -123,11 +135,7 @@ const Home: React.FC = () => {
 
     useEffect(() => {
         getData();
-    }, [])
-
-    // useEffect(()=>{
-    //     console.log(daysOfWeek)
-    // }, [daysOfWeek])
+    }, []);
     
     return(
         <>
@@ -185,6 +193,7 @@ const Home: React.FC = () => {
                     </Box>
                 </Box>
             </Container>
+            {message.show && <Message message={message.text} type={message.type}/>}
         </>
     )
 }
