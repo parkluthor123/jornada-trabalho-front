@@ -3,7 +3,7 @@ import { Box, Alert, Stack, AlertColor } from "@mui/material";
 
 type MessageProps = {
     message: string;
-    type: "success" | "error" | "warning" | "info" | AlertColor;
+    type: AlertColor;
 
 }
 
